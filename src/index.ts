@@ -149,7 +149,7 @@ bot.onMessage(/^\/end$/i, async (msg) => {
 })
 
 // Section: MEMEs
-bot.onMessage(/(\b|^)(д(а+)[-]*)+(\w*)[.!?,:;()]*$/i, async (msg) => {
+bot.onMessage(/(\s|^)+(д(а+)[-]*)+(\w*)[.!?,:;()]*$/i, async (msg) => {
   const { message_id } = msg
   const { id: chat_id } = msg.chat
 
