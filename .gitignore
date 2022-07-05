@@ -1,0 +1,16 @@
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# dotenv environment variables files
+.env
+src/types/environment.d.ts
+
+# build and production
+build/
+
+# developer things
+todo.yaml
+code-archive/

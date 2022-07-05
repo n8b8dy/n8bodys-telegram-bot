@@ -1,0 +1,18 @@
+start - shows initial message
+help - shows all the available commands
+commands - shows all the available commands
+bot_info - shows information about the bot
+about_bot - shows information about the bot
+bot - shows information about the bot
+my_info - shows information about the user
+about_me - shows information about the user
+me - shows information about the user
+chat_info - shows information about the chat (cannot be used in private chats)
+about_chat - shows information about the chat (cannot be used in private chats)
+chat - shows information about the chat (cannot be used in private chats)
+show_the_sticker - with [ID] shows the sticker with the provided ID
+what_is_the_sticker - with [ID] shows the sticker with the provided ID
+sticker_by_id - with [ID] shows the sticker with the provided ID
+sbi - with [ID] shows the sticker with the provided ID
+meme - sends a random meme
+photo - sends a random photo
