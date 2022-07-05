@@ -149,11 +149,11 @@ bot.onMessage(/^\/end$/i, async (msg) => {
 })
 
 // Section: MEMEs
-bot.onMessage(/(\w*)(д(а+)[-]*)+(\w*)[.!?,:;()]*$/i, async (msg) => {
+bot.onMessage(/(\b|^)(д(а+)[-]*)+(\w*)[.!?,:;()]*$/i, async (msg) => {
   const { message_id } = msg
   const { id: chat_id } = msg.chat
 
-  const answer = Math.random() < 0.1
+  const answer = Math.random() < 1
 
   const stickers = ['CAACAgIAAxkBAAIDAmK8n1Vsf_8N1QMp3mBHwpUQe4g0AAKkGgACUgToSfJnbfUmbHSIKQQ']
 
@@ -185,7 +185,7 @@ bot.onMessage(/^\/meme$/i, async (msg) => {
 bot.onMessage(/^\/photo$/i, async (msg) => {
   const { id: chat_id } = msg.chat
 
-  const photo = await fetch(`https://api.unsplash.com/photos/random/?client_id=${process.env.UNSPLASH_ACCES_KEY}`, {
+  const photo = await fetch(`https://api.unsplash.com/photos/random/?client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
