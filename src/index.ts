@@ -122,7 +122,9 @@ bot.onMessage(/^\/(show_the_sticker|what_is_the_sticker|sticker_by_id|sbi(\s?)(.
 
   const sticker_id = String(match?.[3]).trim()
 
-  if (!sticker_id) return bot.sendMessage({ chat_id, text: 'Sorry, but you have to provide and ID for this command', reply_to_message_id: message_id })
+  if (!sticker_id) {
+    return bot.sendMessage({ chat_id, text: 'Sorry, but you have to provide and ID for this command', reply_to_message_id: message_id })
+  }
 
   const response = 'The sticker with that ID is:'
 
@@ -160,8 +162,21 @@ bot.onMessage(/(\s|^)+(д(а+)[-]*)+(\w*)[.!?,:;()]*$/i, async (msg) => {
   if (answer) await bot.sendSticker({ chat_id, sticker: stickers[0], reply_to_message_id: message_id })
 })
 
-bot.onMessage(/^\/meme$/i, async (msg) => {
+bot.onMessage(/^\/meme(\s*)(\d*)$/i, async (msg, match) => {
+  const { message_id } = msg
   const { id: chat_id } = msg.chat
+
+  const maxAmount = 16
+  let amount = Number(match?.[2]) || 1
+
+  if (amount > maxAmount) {
+    amount = maxAmount
+    await bot.sendMessage({
+      chat_id,
+      text: `Sending only ${maxAmount} (maximum amount of memes per one command call)`,
+      reply_to_message_id: message_id,
+    })
+  }
 
   const subreddits = [
     'bulgaria',
@@ -169,34 +184,56 @@ bot.onMessage(/^\/meme$/i, async (msg) => {
     'meme', 'Memes_Of_The_Dank', 'memes',
   ]
 
-  const meme = await fetch(`https://meme-api.herokuapp.com/gimme/${selectRandomFrom(subreddits)}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(response => response.json())
+  const sendMeme = async (times: number) => {
+    const meme = await fetch(`https://meme-api.herokuapp.com/gimme/${selectRandomFrom(subreddits)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => response.json())
+    const response = meme.title === 'Title' ? '' : meme.title
+    await bot.sendPhoto({ chat_id, photo: meme.url, caption: response })
 
-  console.log(meme)
+    if (times > 1) await sendMeme(times - 1)
+  }
 
-  const response = meme.title === 'Title' ? '' : meme.title
-  await bot.sendPhoto({ chat_id, photo: meme.url, caption: response })
+  await sendMeme(amount)
 })
 
-bot.onMessage(/^\/photo$/i, async (msg) => {
+bot.onMessage(/^\/photo(\s*)(\d*)$/i, async (msg, match) => {
+  const { message_id } = msg
   const { id: chat_id } = msg.chat
 
-  const photo = await fetch(`https://api.unsplash.com/photos/random/?client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept-Version': 'v1',
-    },
-  }).then(response => response.json()).catch(error => console.error(error))
+  const maxAmount = 4
+  let amount = Number(match?.[2]) || 1
 
-  const response = escapeFormatting(photo.description || photo.alt_description || '') + '\n' +
-    `by [${photo.user.name}](${photo.user.links.html})`
+  if (amount > maxAmount) {
+    amount = maxAmount
+    await bot.sendMessage({
+      chat_id,
+      text: `Sending only ${maxAmount} (maximum amount of photos per one command call)`,
+      reply_to_message_id: message_id,
+    })
+  }
 
-  await bot.sendPhoto({ chat_id, photo: photo.urls.regular, caption: response, parse_mode: 'Markdown' })
+  const sendPhoto = async (times: number) => {
+    const photo = await fetch(`https://api.unsplash.com/photos/random/?client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-Version': 'v1',
+      },
+    }).then(response => response.json()).catch(error => console.error(error))
+
+    const response = escapeFormatting(photo.description || photo.alt_description || '') + '\n' +
+      `by [${photo.user.name}](${photo.user.links.html})`
+
+    await bot.sendPhoto({ chat_id, photo: photo.urls.regular, caption: response, parse_mode: 'Markdown' })
+
+    if (times > 1) await sendPhoto(times - 1)
+  }
+
+  await sendPhoto(amount)
 })
 
 // // Section: TESTs
