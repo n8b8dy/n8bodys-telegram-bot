@@ -153,7 +153,7 @@ bot.onMessage(/(\b|^)(д(а+)[-]*)+(\w*)[.!?,:;()]*$/i, async (msg) => {
   const { message_id } = msg
   const { id: chat_id } = msg.chat
 
-  const answer = Math.random() < 0.1
+  const answer = Math.random() < 1
 
   const stickers = ['CAACAgIAAxkBAAIDAmK8n1Vsf_8N1QMp3mBHwpUQe4g0AAKkGgACUgToSfJnbfUmbHSIKQQ']
 
