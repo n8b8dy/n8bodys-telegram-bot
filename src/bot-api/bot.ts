@@ -5,6 +5,7 @@ import type { Chat, ChatMember, File, Message, User, UserProfilePhotos } from '.
 import type {
   BotSettings,
   Commands,
+  Query,
   SendMessageOptions, SendPhotoOptions, SendAnimationOptions, SendStickerOptions,
   BanChatMemberOptions, UnbanChatMemberOptions,
   GetUserProfileOptions,
@@ -29,8 +30,13 @@ export class TelegramBot {
     this.#commands = new Proxy({}, {
       get (target: Commands, property: string) {
         for (const key in target) {
-          if (target[key].type === 'string') { if (new RegExp(key).test(property)) { return target[key] } }
-          else if (target[key].type === 'RegExp') { if (target[key].regexp?.test(property)) { return target[key] } }
+          if (target[key].type === 'string') { if (key === property) return target[key] }
+          else if (target[key].type === 'Array<string>') {
+            for (const alias of (target[key].aliases || [])) {
+              if (alias === property) return target[key]
+            }
+          }
+          else if (target[key].type === 'RegExp') { if (target[key].regexp?.test(property)) return target[key] }
         }
 
         return null
@@ -38,9 +44,13 @@ export class TelegramBot {
       getOwnPropertyDescriptor (target: Commands, property: string) {
         for (const key in target) {
           if (target[key].type === 'string') {
-            if (new RegExp(key).test(property)) { return { configurable: true, enumerable: true } }
+            if (key === property) return { configurable: true, enumerable: true }
+          } else if (target[key].type === 'Array<string>') {
+            for (const alias of (target[key].aliases || [])) {
+              if (alias === property) return { configurable: true, enumerable: true }
+            }
           } else if (target[key].type === 'RegExp') {
-            if (target[key].regexp?.test(property)) { return { configurable: true, enumerable: true } }
+            if (target[key].regexp?.test(property)) return { configurable: true, enumerable: true }
           }
         }
       },
@@ -126,10 +136,13 @@ export class TelegramBot {
     })
   }
 
-  async onMessage (query: string | RegExp, handler: (message: Message, match?: Array<string> | string) => void) {
+  async onMessage (query: Query, handler: (message: Message, match?: Array<string> | string) => void) {
     console.log(query)
     if (typeof query === 'string') this.#commands[query] = { type: 'string', handler }
-    else { this.#commands[String(query)] = { type: 'RegExp', regexp: query, handler } }
+    else if (Array.isArray(query) && typeof query[0] === 'string') {
+      this.#commands[query.join('|')] = { type: 'Array<string>', aliases: query, handler }
+    }
+    else if (query instanceof RegExp) { this.#commands[String(query)] = { type: 'RegExp', regexp: query, handler } }
   }
 
   async getMe (): Promise<User> {

@@ -6,11 +6,14 @@ export interface BotSettings {
 }
 export interface Commands {
   [key: string]: {
-    type: 'string' | 'RegExp'
+    type: 'string' | 'Array<string>' | 'RegExp'
+    aliases?: Array<string>
     regexp?: RegExp
     handler: (message: Message, match?: Array<string> | string) => void
   }
 }
+
+export type Query = string | RegExp | Array<string>
 
 export interface SendMessageOptions {
   chat_id: number | string

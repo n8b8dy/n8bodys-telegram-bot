@@ -13,7 +13,7 @@ const { BOT_TOKEN, SERVER_URL, PORT } = process.env
 const bot = new TelegramBot({ botToken: BOT_TOKEN, serverUrl: SERVER_URL })
 bot.listen(PORT || 5000)
 
-bot.onMessage(/^\/start$/i, async (msg) => {
+bot.onMessage('/start', async (msg) => {
   const { id: chat_id, type } = msg.chat
 
   const response = welcomeMessage
@@ -22,7 +22,7 @@ bot.onMessage(/^\/start$/i, async (msg) => {
   if (type === 'private') await bot.sendSticker({ chat_id, sticker: String(selectRandomFrom(welcomeStickers)) })
 })
 
-bot.onMessage(/^\/help|commands$/i, async (msg) => {
+bot.onMessage(['/help', '/commands'], async (msg) => {
   const { id: chat_id } = msg.chat
 
   const response = functionalityInfo
